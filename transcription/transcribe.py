@@ -3,6 +3,9 @@ import requests
 import whisper
 from flask import request, jsonify
 from transformers import PreTrainedTokenizerFast, BartForConditionalGeneration
+import boto3
+from botocore.exceptions import NoCredentialsError
+
 # from oracle_db import OracleDB
 from db.db_connect import OracleDB
 
@@ -13,7 +16,30 @@ whisper_model = whisper.load_model("base")
 tokenizer = PreTrainedTokenizerFast.from_pretrained('gogamza/kobart-base-v2')
 bart_model = BartForConditionalGeneration.from_pretrained('gogamza/kobart-summarization')
 
+# S3 버킷 정보
+S3_BUCKET_NAME = 'intelliclassbucket'
+S3_FFMPEG_PATH = 'ffmpeg/'
+
+# FFmpeg 바이너리를 로컬에 다운로드
+def download_ffmpeg_from_s3():
+    s3 = boto3.client('s3')
+    ffmpeg_files = ['ffmpeg.exe', 'ffplay.exe', 'ffprobe.exe']
+    local_bin_dir = os.path.join(os.path.dirname(__file__), '../ffmpeg', 'bin')
+    os.makedirs(local_bin_dir, exist_ok=True)
+
+    for file in ffmpeg_files:
+        local_file_path = os.path.join(local_bin_dir, file)
+        if not os.path.exists(local_file_path):
+            try:
+                s3.download_file(S3_BUCKET_NAME, f"{S3_FFMPEG_PATH}{file}", local_file_path)
+                print(f"{file} downloaded from S3.")
+            except NoCredentialsError:
+                print(f"Credentials not available for {file}.")
+            except Exception as e:
+                print(f"Error downloading {file} from S3: {e}")
+
 # FFmpeg 경로 설정
+download_ffmpeg_from_s3()
 ffmpeg_path = os.path.join(os.path.dirname(__file__), '../ffmpeg', 'bin')
 os.environ["PATH"] += os.pathsep + ffmpeg_path
 
