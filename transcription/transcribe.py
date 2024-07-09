@@ -1,13 +1,15 @@
 import os
 import requests
 import whisper
-from flask import request, jsonify
+from flask import Flask, request, jsonify
 from transformers import PreTrainedTokenizerFast, BartForConditionalGeneration
 import boto3
-from botocore.exceptions import NoCredentialsError
+from botocore.exceptions import NoCredentialsError, ClientError
 
 # from oracle_db import OracleDB
 from db.db_connect import OracleDB
+
+app = Flask(__name__)
 
 # Whisper 모델 로드
 whisper_model = whisper.load_model("base")
@@ -18,7 +20,7 @@ bart_model = BartForConditionalGeneration.from_pretrained('gogamza/kobart-summar
 
 # S3 버킷 정보
 S3_BUCKET_NAME = 'intelliclassbucket'
-S3_FFMPEG_PATH = 'ffmpeg/'
+S3_FFMPEG_PATH = 'ffmpeg/bin/'  # 'ffmpeg/bin/' 경로로 수정
 
 # FFmpeg 바이너리를 로컬에 다운로드
 def download_ffmpeg_from_s3():
@@ -35,6 +37,8 @@ def download_ffmpeg_from_s3():
                 print(f"{file} downloaded from S3.")
             except NoCredentialsError:
                 print(f"Credentials not available for {file}.")
+            except ClientError as e:
+                print(f"Client error: {e}")
             except Exception as e:
                 print(f"Error downloading {file} from S3: {e}")
 
@@ -57,6 +61,7 @@ def get_video_url_from_db(lecture_id):
     finally:
         db.close()
 
+@app.route('/video-url')
 def video_url():
     lecture_id = request.args.get('lecture_id')
     video_url = get_video_url_from_db(lecture_id)
@@ -64,6 +69,7 @@ def video_url():
         return jsonify({"error": "Video URL not found"}), 404
     return jsonify({"video_url": video_url})
 
+@app.route('/transcribe')
 def transcribe():
     video_url = request.args.get('video_url')
     local_filename = "downloaded_audio.mp4"
