@@ -5,7 +5,7 @@ from face_recognition.login import login_face
 from transcription.transcribe import video_url, transcribe
 from certificate.pdf_processing import upload_file
 from certificate.verify_certificate import verify_certificate
-from open_ai.ai_model import analyze_code_with_ai, analyze_code
+from open_ai.ai_model import analyze_code_with_ai
 
 import os
 import threading
@@ -54,7 +54,7 @@ app.add_url_rule('/upload', 'upload_file', upload_file, methods=['POST'])  # PDF
 app.add_url_rule('/verify', 'verify_certificate', verify_certificate, methods=['POST'])  # 자격증 진위 확인 엔드포인트
 
 # 시원
-app.add_url_rule('/analyze', 'analyze_code', analyze_code, methods=['POST'])  # 코드 분석 엔드포인트
+app.add_url_rule('/analyze', 'analyze_code_with_ai', analyze_code_with_ai, methods=['POST'])  # 코드 분석 엔드포인트
 
 #건우
 def crowling_task():
