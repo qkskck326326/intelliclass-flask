@@ -11,9 +11,9 @@
 
 디렉토리 생성: New-Item -ItemType Directory -Path "$HOME\.aws"
 
-자격 증명 파일 생성: New-Item -ItemType File -Path "$HOME\.aws\credentials"
+S3 자격 증명 파일 생성: New-Item -ItemType File -Path "$HOME\.aws\credentials"
 
-자격 증명 파일 편집: notepad "$HOME\.aws\credentials"
+S3 자격 증명 파일 편집: notepad "$HOME\.aws\credentials"
 
 메모장이 뜨면
 
