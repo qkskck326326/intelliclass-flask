@@ -26,6 +26,8 @@ S3 자격 증명 파일 편집: notepad "$HOME\.aws\credentials"
 
 [default]
 
+
+
 aws_access_key_id = 액세스키
 
 aws_secret_access_key = 시크릿 액세스키
