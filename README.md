@@ -1,3 +1,9 @@
+# IntelliClass - AI Part
+IntelliClass 에서 요구하는 AI기능을 제공
+
+
+
+
 # intelliclass-flask
 
 Get from Version Control에서
